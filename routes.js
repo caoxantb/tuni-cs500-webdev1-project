@@ -108,7 +108,9 @@ const handleRequest = async (request, response) => {
   if (filePath === "/api/users" && method.toUpperCase() === "GET") {
     // TODO: 8.5 Add authentication (only allowed to users with role "admin") --> DONE
     const user = await getCurrentUser(request);
-    if (!user) responseUtils.basicAuthChallenge(response);
+    if (!user) {
+      return responseUtils.basicAuthChallenge(response);
+    }
     else if (user.role === "customer") {
       response.statusCode = 403;
       return response.end();
