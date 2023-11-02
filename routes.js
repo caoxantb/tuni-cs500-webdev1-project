@@ -106,9 +106,20 @@ const handleRequest = async (request, response) => {
   // GET all users
   if (filePath === "/api/users" && method.toUpperCase() === "GET") {
     // TODO: 8.5 Add authentication (only allowed to users with role "admin")
-    return responseUtils.sendJson(response, getAllUsers());
-  }
+    const user = await getCurrentUser(request);
+    if (!user) {
+      return responseUtils.basicAuthChallenge(response);
+    }
+    else if (user.role = "customer") {
+      response.statusCode = 403;
+      return response.end();
+    }
 
+    // Send all users in JSON format
+    const users = getAllUsers();
+    return responseUtils.sendJson(response, users);
+  }
+  
   // register new user
   if (filePath === "/api/register" && method.toUpperCase() === "POST") {
     // Fail if not a JSON request, don't allow non-JSON Content-Type

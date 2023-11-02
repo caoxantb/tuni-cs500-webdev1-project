@@ -10,19 +10,8 @@ const getCurrentUser = async request => {
   // NOTE: You can import two methods which can be useful here: // - getCredentials(request) function from utils/requestUtils.js
   // - getUser(email, password) function from utils/users.js to get the currently logged in user
   const credentials = getCredentials(request);
-  if (!credentials) {
-    return null;
-  }
-
-  const token = credentials.token;
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.sub;
-    const user = await getUser(userId);
-    return user;
-  } catch (err) {
-    return null;
-  }
+  const currentUser = credentials && credentials.length === 2 && getUser(...credentials);
+  return currentUser;  
 };
 
 module.exports = { getCurrentUser };
