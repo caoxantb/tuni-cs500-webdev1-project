@@ -83,7 +83,7 @@ const handleRequest = async (request, response) => {
     // - getUserById(userId) from /utils/users.js
     // - notFound(response) from  /utils/responseUtils.js
     // - sendJson(response,  payload)  from  /utils/responseUtils.js can be used to send the requested data in JSON format
-    throw new Error("Not Implemented");
+    return 0;
   }
 
   // Default to 404 Not Found if unknown url
