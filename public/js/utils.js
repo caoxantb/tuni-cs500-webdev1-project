@@ -72,7 +72,7 @@ const postOrPutJSON = async (url, method, data = {}) => {
  * @returns {Promise<*>} promise that resolves to the parsed JSON
  */
 const deleteResource = async (url) => {
-  // TODO: 8.6 Implement this
+  // TODO: 8.6 Implement this --> DONE
   const response = await fetch(url, {
     method: "DELETE",
     credentials: "same-origin",

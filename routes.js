@@ -78,7 +78,7 @@ const handleRequest = async (request, response) => {
   }
 
   if (matchUserId(filePath)) {
-    // TODO: 8.6 Implement view, update and delete a single user by ID (GET, PUT, DELETE)
+    // TODO: 8.6 Implement view, update and delete a single user by ID (GET, PUT, DELETE) --> DONE
     // You can use parseBodyJson(request) from utils/requestUtils.js to parse request body
 
     // If the HTTP method of a request is OPTIONS you can use sendOptions(filePath, response) function from this module
