@@ -6,6 +6,9 @@ const {
   getAllUsers,
   saveNewUser,
   validateUser,
+  getUserById,
+  updateUserRole,
+  deleteUserById,
 } = require("./utils/users");
 const { getCurrentUser } = require("./auth/auth");
 
@@ -75,8 +78,9 @@ const handleRequest = async (request, response) => {
   }
 
   if (matchUserId(filePath)) {
-    // TODO: 8.6 Implement view, update and delete a single user by ID (GET, PUT, DELETE)
+    // TODO: 8.6 Implement view, update and delete a single user by ID (GET, PUT, DELETE) --> DONE
     // You can use parseBodyJson(request) from utils/requestUtils.js to parse request body
+
     // If the HTTP method of a request is OPTIONS you can use sendOptions(filePath, response) function from this module
     // If there is no currently logged in user, you can use basicAuthChallenge(response) from /utils/responseUtils.js to ask for credentials
     //  If the current user's role is not admin you can use forbidden(response) from /utils/responseUtils.js to send a reply
@@ -84,7 +88,41 @@ const handleRequest = async (request, response) => {
     // - getUserById(userId) from /utils/users.js
     // - notFound(response) from  /utils/responseUtils.js
     // - sendJson(response,  payload)  from  /utils/responseUtils.js can be used to send the requested data in JSON format
-    throw new Error("Not Implemented");
+    const currentUser = await getCurrentUser(request);
+    if (!currentUser) return responseUtils.basicAuthChallenge(response);
+    else if (currentUser.role !== "admin")
+      return responseUtils.forbidden(response);
+
+    const filePathArr = filePath.split("/");
+    let user, body;
+
+    if (filePathArr.length === 4) {
+      switch (method.toUpperCase()) {
+        case "OPTIONS":
+          return sendOptions(filePath, response);
+        case "GET":
+          user = getUserById(filePathArr[3]);
+          return user
+            ? responseUtils.sendJson(response, user)
+            : responseUtils.notFound(response, "404 Not Found");
+        case "PUT":
+          body = await parseBodyJson(request);
+          if (!body.role || !["customer", "admin"].includes(body.role))
+            return responseUtils.badRequest(response, "400 Bad Request");
+          user = updateUserRole(filePathArr[3], body.role);
+          return user
+            ? responseUtils.sendJson(response, user)
+            : responseUtils.notFound(response, "404 Not Found");
+        case "DELETE":
+          user = deleteUserById(filePathArr[3]);
+          return user
+            ? responseUtils.sendJson(response, user)
+            : responseUtils.notFound(response, "404 Not Found");
+        default:
+          return responseUtils.methodNotAllowed(response);
+      }
+    }
+    responseUtils.badRequest(response, "400 Bad Request");
   }
 
   // Default to 404 Not Found if unknown url
