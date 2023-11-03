@@ -83,7 +83,39 @@ const handleRequest = async (request, response) => {
     // - getUserById(userId) from /utils/users.js
     // - notFound(response) from  /utils/responseUtils.js
     // - sendJson(response,  payload)  from  /utils/responseUtils.js can be used to send the requested data in JSON format
-    return 0;
+    const user = await getCurrentUser(request);
+    if (!user) {
+      return responseUtils.basicAuthChallenge(response);
+    }
+    else if (user.role !== "admin") {
+      return responseUtils.forbidden(response);
+    }
+
+    const userId = filePath.split("/").pop();
+    const userById = getUserById(userId);
+
+    if (!userById) {
+      return responseUtils.notFound(response);
+    }
+
+    if (method.toUpperCase() === "GET") {
+      return responseUtils.sendJson(response, userById);
+    }
+
+    if (method.toUpperCase() === "PUT") {
+      const body = await parseBodyJson(request);
+      const updatedUser = { ...userById, ...body };
+      const errors = validateUser(updatedUser);
+      if (!!errors.length) {
+        return responseUtils.badRequest(response, "400 Bad Request");
+      }
+      return responseUtils.sendJson(response, saveNewUser(updatedUser));
+    }
+
+    if (method.toUpperCase() === "DELETE") {
+      deleteUserById(userId);
+      return responseUtils.sendJson(response, { message: "User deleted successfully" });
+    }
   }
 
   // Default to 404 Not Found if unknown url
