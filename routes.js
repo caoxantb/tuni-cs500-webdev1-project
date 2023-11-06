@@ -11,6 +11,7 @@ const {
   deleteUserById,
 } = require("./utils/users");
 const { getCurrentUser } = require("./auth/auth");
+const { getAllProducts } = require("./utils/products");
 
 /**
  * Known API routes and their allowed methods
@@ -21,6 +22,7 @@ const { getCurrentUser } = require("./auth/auth");
 const allowedMethods = {
   "/api/register": ["POST"],
   "/api/users": ["GET"],
+  "/api/products": ["GET"],
 };
 
 /**
@@ -79,15 +81,7 @@ const handleRequest = async (request, response) => {
 
   if (matchUserId(filePath)) {
     // TODO: 8.6 Implement view, update and delete a single user by ID (GET, PUT, DELETE) --> DONE
-    // You can use parseBodyJson(request) from utils/requestUtils.js to parse request body
 
-    // If the HTTP method of a request is OPTIONS you can use sendOptions(filePath, response) function from this module
-    // If there is no currently logged in user, you can use basicAuthChallenge(response) from /utils/responseUtils.js to ask for credentials
-    //  If the current user's role is not admin you can use forbidden(response) from /utils/responseUtils.js to send a reply
-    // Useful methods here include:
-    // - getUserById(userId) from /utils/users.js
-    // - notFound(response) from  /utils/responseUtils.js
-    // - sendJson(response,  payload)  from  /utils/responseUtils.js can be used to send the requested data in JSON format
     const currentUser = await getCurrentUser(request);
     if (!currentUser) return responseUtils.basicAuthChallenge(response);
     else if (currentUser.role !== "admin")
@@ -148,8 +142,7 @@ const handleRequest = async (request, response) => {
     const user = await getCurrentUser(request);
     if (!user) {
       return responseUtils.basicAuthChallenge(response);
-    }
-    else if (user.role === "customer") {
+    } else if (user.role === "customer") {
       response.statusCode = 403;
       return response.end();
     }
@@ -180,6 +173,17 @@ const handleRequest = async (request, response) => {
           saveNewUser({ ...user, role: "customer" }),
           201
         );
+  }
+
+  // read all products
+  if (filePath === "/api/products" && method.toUpperCase() === "GET") {
+    const currentUser = await getCurrentUser(request);
+    if (!currentUser) return responseUtils.basicAuthChallenge(response);
+    if (["customer", "admin"].includes(currentUser.role)) {
+      const products = getAllProducts();
+      return responseUtils.sendJson(response, products);
+    }
+    return responseUtils.forbidden(response);
   }
 };
 
