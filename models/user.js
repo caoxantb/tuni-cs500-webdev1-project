@@ -25,14 +25,18 @@ const SCHEMA_DEFAULTS = {
   }
 };
 
-// TODO: 9.5 Implement the userSchema
+// TODO: 9.5 Implement the userSchema --> DONE
 const userSchema = new Schema({
   // for 'name' 
   // set type
   // and the following validators:
   // required, trim, minlength, maxlength 
   name: {
-
+    type: String,
+    required: true,
+    trim: true,
+    minLength: SCHEMA_DEFAULTS.name.minLength,
+    maxLength: SCHEMA_DEFAULTS.name.maxLength
   },
   // for 'email'
   // set type
@@ -44,7 +48,11 @@ const userSchema = new Schema({
 
   //       
   email: {
-
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+    match: SCHEMA_DEFAULTS.email.match
   },
   // for 'password'
   // set type
@@ -57,14 +65,27 @@ const userSchema = new Schema({
   // }
   // 
   password: {
-
+    type: String,
+    required: true,
+    minLength: SCHEMA_DEFAULTS.password.minLength,
+    set: password => {
+      if (!password || password === undefined || password.length < 10) {
+        return password;
+      }
+      return bcrypt.hashSync(password, SALT_ROUNDS);
+    }
   },
   // for 'role'
   // set type
   // and the following validators:
   //  required, trim, lowercase, enum,    default
   role: {
-
+    type: String,
+    required: true,
+    trim: true,
+    lowercase: true,
+    enum: SCHEMA_DEFAULTS.role.values,
+    default: SCHEMA_DEFAULTS.role.defaultValue
   }
 });
 
@@ -75,7 +96,7 @@ const userSchema = new Schema({
  * @returns {Promise<boolean>} promise that resolves to the comparison result
  */
 userSchema.methods.checkPassword = async function(password) {
-  // TODO: 9.5 Implement this
+  // TODO: 9.5 Implement this --> DONE
   // Here you should return the result you get from bcrypt.compare() function. Remember to await! :-)
   // In this method you can just do a one-liner, 
   // which returns the results of using BCrypt's compare() function. 
@@ -83,6 +104,7 @@ userSchema.methods.checkPassword = async function(password) {
   //      - password as given as parameter to the call to this method
   //      - the password of the user from the User model (this.password). 
   //          Here we see one of the few places where we need to use 'this' keyword.
+  return bcrypt.compare(password, this.password);
 };
 
 // Omit the version key when serialized to JSON
