@@ -11,11 +11,11 @@ require('dotenv').config();
  * @returns {string} connection URL
  */
 const getDbUrl = () => {
-  // TODO: 9.4 Implement this
+  // TODO: 9.4 Implement this --> DONE
   return process.env.DBURL || 'mongodb://localhost:27017/WebShopDb';
 };
 
-function connectDB() {
+const connectDB = () => {
   // Do nothing if already connected
   if (!mongoose.connection || mongoose.connection.readyState === 0) {
     mongoose
@@ -35,15 +35,15 @@ function connectDB() {
       })
       .catch(handleCriticalError);
   }
-}
+};
 
-function handleCriticalError(err) {
+const handleCriticalError = (err) => {
   console.error(err);
   throw err;
-}
+};
 
-function disconnectDB() {
+const disconnectDB = () => {
   mongoose.disconnect();
-}
+};
 
 module.exports = { connectDB, disconnectDB, getDbUrl };

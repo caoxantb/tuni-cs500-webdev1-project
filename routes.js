@@ -1,17 +1,9 @@
 const responseUtils = require("./utils/responseUtils");
 const { acceptsJson, isJson, parseBodyJson } = require("./utils/requestUtils");
 const { renderPublic } = require("./utils/render");
-const {
-  emailInUse,
-  getAllUsers,
-  saveNewUser,
-  validateUser,
-  getUserById,
-  updateUserRole,
-  deleteUserById,
-} = require("./utils/users");
 const { getCurrentUser } = require("./auth/auth");
 const { getAllProducts } = require("./utils/products");
+const User = require("./models/user");
 
 /**
  * Known API routes and their allowed methods
@@ -81,7 +73,6 @@ const handleRequest = async (request, response) => {
 
   if (matchUserId(filePath)) {
     // TODO: 8.6 Implement view, update and delete a single user by ID (GET, PUT, DELETE) --> DONE
-
     const currentUser = await getCurrentUser(request);
     if (!currentUser) return responseUtils.basicAuthChallenge(response);
     else if (currentUser.role !== "admin")
@@ -95,7 +86,7 @@ const handleRequest = async (request, response) => {
         case "OPTIONS":
           return sendOptions(filePath, response);
         case "GET":
-          user = getUserById(filePathArr[3]);
+          user = await User.findById({_id: filePathArr[3]}).exec();
           return user
             ? responseUtils.sendJson(response, user)
             : responseUtils.notFound(response, "404 Not Found");
@@ -103,15 +94,16 @@ const handleRequest = async (request, response) => {
           body = await parseBodyJson(request);
           if (!body.role || !["customer", "admin"].includes(body.role))
             return responseUtils.badRequest(response, "400 Bad Request");
-          user = updateUserRole(filePathArr[3], body.role);
+          await User.findByIdAndUpdate(filePathArr[3], {role: body.role}).exec();
+          user = await User.findById(filePathArr[3]).exec();
           return user
             ? responseUtils.sendJson(response, user)
             : responseUtils.notFound(response, "404 Not Found");
         case "DELETE":
-          user = deleteUserById(filePathArr[3]);
-          return user
-            ? responseUtils.sendJson(response, user)
-            : responseUtils.notFound(response, "404 Not Found");
+          user = await User.findById(filePathArr[3]).exec();
+          if (!user) return responseUtils.notFound(response, "404 Not Found");
+          await User.deleteOne({_id: filePathArr[3]}).exec();
+          return responseUtils.sendJson(response, user);
         default:
           return responseUtils.methodNotAllowed(response);
       }
@@ -143,10 +135,10 @@ const handleRequest = async (request, response) => {
     if (!user) {
       return responseUtils.basicAuthChallenge(response);
     } else if (user.role === "customer") {
-      response.statusCode = 403;
-      return response.end();
+      return responseUtils.forbidden(response);
     }
-    return responseUtils.sendJson(response, getAllUsers());
+    const users = await User.find({}).exec();
+    return responseUtils.sendJson(response, users);
   }
 
   // register new user
@@ -160,19 +152,15 @@ const handleRequest = async (request, response) => {
     }
     // TODO: 8.4 Implement registration --> DONE
     // You can use parseBodyJson(request) method from utils/requestUtils.js to parse request body.
-    // Useful methods here include:
-    // - validateUser(user) from /utils/users.js
-    // - emailInUse(user.email) from /utils/users.js
-    // - badRequest(response, message) from /utils/responseUtils.js
     const user = await parseBodyJson(request);
-    const errors = validateUser(user);
-    !!errors.length || emailInUse(user.email)
-      ? responseUtils.badRequest(response, "400 Bad Request")
-      : responseUtils.sendJson(
-          response,
-          saveNewUser({ ...user, role: "customer" }),
-          201
-        );
+    try {
+      const newUser = new User({ ...user, role: "customer" });
+      await newUser.save();
+      responseUtils.sendJson(response, newUser, 201);
+    }
+    catch (e) {
+      responseUtils.badRequest(response, "400 Bad Request");
+    }
   }
 
   // read all products
