@@ -19,6 +19,8 @@ const getAllUsers = async (response) => {
  * @param {Object} currentUser (mongoose document object)
  */
 const deleteUser = async (response, userId, currentUser) => {
+  if (userId === currentUser._id)
+    return badRequest(response, "400 Bad Request");
   const user = await User.findById(userId).exec();
   if (!user) return notFound(response, "404 Not Found");
   await User.deleteOne({ _id: userId }).exec();
@@ -34,7 +36,11 @@ const deleteUser = async (response, userId, currentUser) => {
  * @param {Object} userData JSON data from request body
  */
 const updateUser = async (response, userId, currentUser, userData) => {
-  if (!userData.role || !["customer", "admin"].includes(userData.role))
+  if (
+    !userData.role ||
+    !["customer", "admin"].includes(userData.role) ||
+    userId === currentUser._id
+  )
     return badRequest(response, "400 Bad Request");
   await User.findByIdAndUpdate(userId, { role: userData.role }).exec();
   const user = await User.findById(userId).exec();
