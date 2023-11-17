@@ -2,8 +2,9 @@ const responseUtils = require("./utils/responseUtils");
 const { acceptsJson, isJson, parseBodyJson } = require("./utils/requestUtils");
 const { renderPublic } = require("./utils/render");
 const { getCurrentUser } = require("./auth/auth");
-const { getAllProducts } = require("./utils/products");
+const { getAllProducts } = require("./controllers/products");
 const User = require("./models/user");
+const { getAllUsers, registerUser, deleteUser, updateUser, viewUser } = require("./controllers/users");
 
 /**
  * Known API routes and their allowed methods
@@ -86,24 +87,12 @@ const handleRequest = async (request, response) => {
         case "OPTIONS":
           return sendOptions(filePath, response);
         case "GET":
-          user = await User.findById({_id: filePathArr[3]}).exec();
-          return user
-            ? responseUtils.sendJson(response, user)
-            : responseUtils.notFound(response, "404 Not Found");
+          return await viewUser(response, filePathArr[3], currentUser);
         case "PUT":
           body = await parseBodyJson(request);
-          if (!body.role || !["customer", "admin"].includes(body.role))
-            return responseUtils.badRequest(response, "400 Bad Request");
-          await User.findByIdAndUpdate(filePathArr[3], {role: body.role}).exec();
-          user = await User.findById(filePathArr[3]).exec();
-          return user
-            ? responseUtils.sendJson(response, user)
-            : responseUtils.notFound(response, "404 Not Found");
+          return await updateUser(response, filePathArr[3], currentUser, body);
         case "DELETE":
-          user = await User.findById(filePathArr[3]).exec();
-          if (!user) return responseUtils.notFound(response, "404 Not Found");
-          await User.deleteOne({_id: filePathArr[3]}).exec();
-          return responseUtils.sendJson(response, user);
+          return await deleteUser(response, filePathArr[3], currentUser);
         default:
           return responseUtils.methodNotAllowed(response);
       }
@@ -137,8 +126,7 @@ const handleRequest = async (request, response) => {
     } else if (user.role === "customer") {
       return responseUtils.forbidden(response);
     }
-    const users = await User.find({}).exec();
-    return responseUtils.sendJson(response, users);
+    return await getAllUsers(response);
   }
 
   // register new user
@@ -153,14 +141,7 @@ const handleRequest = async (request, response) => {
     // TODO: 8.4 Implement registration --> DONE
     // You can use parseBodyJson(request) method from utils/requestUtils.js to parse request body.
     const user = await parseBodyJson(request);
-    try {
-      const newUser = new User({ ...user, role: "customer" });
-      await newUser.save();
-      responseUtils.sendJson(response, newUser, 201);
-    }
-    catch (e) {
-      responseUtils.badRequest(response, "400 Bad Request");
-    }
+    return await registerUser(response, user);
   }
 
   // read all products
@@ -168,10 +149,10 @@ const handleRequest = async (request, response) => {
     const currentUser = await getCurrentUser(request);
     if (!currentUser) return responseUtils.basicAuthChallenge(response);
     if (["customer", "admin"].includes(currentUser.role)) {
-      const products = getAllProducts();
-      return responseUtils.sendJson(response, products);
+      return getAllProducts(response);
     }
     return responseUtils.forbidden(response);
+    // return getAllProducts(request, response);
   }
 };
 

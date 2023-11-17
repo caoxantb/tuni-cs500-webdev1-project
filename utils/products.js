@@ -1,5 +1,5 @@
 const products = require("../products.json").map((product) => ({ ...product }));
 
-const getAllProducts = () => products.map((product) => ({ ...product }));
+const getAllProductsRaw = () => products.map((product) => ({ ...product }));
 
-module.exports = { getAllProducts };
+module.exports = { getAllProductsRaw };

@@ -1,11 +1,14 @@
+const User = require("../models/user");
+const { sendJson, badRequest, notFound } = require("../utils/responseUtils");
+
 /**
  * Send all users as JSON
  *
  * @param {http.ServerResponse} response
  */
-const getAllUsers = async response => {
-  // TODO: 10.2 Implement this
-  throw new Error('Not Implemented');
+const getAllUsers = async (response) => {
+  const users = await User.find({}).exec();
+  return sendJson(response, users);
 };
 
 /**
@@ -15,9 +18,11 @@ const getAllUsers = async response => {
  * @param {string} userId
  * @param {Object} currentUser (mongoose document object)
  */
-const deleteUser = async(response, userId, currentUser) => {
-  // TODO: 10.2 Implement this
-  throw new Error('Not Implemented');
+const deleteUser = async (response, userId, currentUser) => {
+  const user = await User.findById(userId).exec();
+  if (!user) return notFound(response, "404 Not Found");
+  await User.deleteOne({ _id: userId }).exec();
+  return sendJson(response, user);
 };
 
 /**
@@ -28,9 +33,12 @@ const deleteUser = async(response, userId, currentUser) => {
  * @param {Object} currentUser (mongoose document object)
  * @param {Object} userData JSON data from request body
  */
-const updateUser = async(response, userId, currentUser, userData) => {
-  // TODO: 10.2 Implement this
-  throw new Error('Not Implemented');
+const updateUser = async (response, userId, currentUser, userData) => {
+  if (!userData.role || !["customer", "admin"].includes(userData.role))
+    return badRequest(response, "400 Bad Request");
+  await User.findByIdAndUpdate(userId, { role: userData.role }).exec();
+  const user = await User.findById(userId).exec();
+  return user ? sendJson(response, user) : notFound(response, "404 Not Found");
 };
 
 /**
@@ -40,9 +48,9 @@ const updateUser = async(response, userId, currentUser, userData) => {
  * @param {string} userId
  * @param {Object} currentUser (mongoose document object)
  */
-const viewUser = async(response, userId, currentUser) => {
-  // TODO: 10.2 Implement this
-  throw new Error('Not Implemented');
+const viewUser = async (response, userId, currentUser) => {
+  const user = await User.findById({ _id: userId }).exec();
+  return user ? sendJson(response, user) : notFound(response, "404 Not Found");
 };
 
 /**
@@ -51,9 +59,21 @@ const viewUser = async(response, userId, currentUser) => {
  * @param {http.ServerResponse} response
  * @param {Object} userData JSON data from request body
  */
-const registerUser = async(response, userData) => {
-  // TODO: 10.2 Implement this
-  throw new Error('Not Implemented');
+
+const registerUser = async (response, userData) => {
+  try {
+    const newUser = new User({ ...userData, role: "customer" });
+    await newUser.save();
+    return sendJson(response, newUser, 201);
+  } catch (e) {
+    badRequest(response, "400 Bad Request");
+  }
 };
 
-module.exports = { getAllUsers, registerUser, deleteUser, viewUser, updateUser };
+module.exports = {
+  getAllUsers,
+  registerUser,
+  deleteUser,
+  viewUser,
+  updateUser,
+};
