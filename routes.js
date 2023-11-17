@@ -141,7 +141,6 @@ const handleRequest = async (request, response) => {
     // TODO: 8.4 Implement registration --> DONE
     // You can use parseBodyJson(request) method from utils/requestUtils.js to parse request body.
     const user = await parseBodyJson(request);
-    if(user.password.length < 10) return responseUtils.badRequest(response, "400 Bad Request"); 
     return await registerUser(response, user);
   }
 

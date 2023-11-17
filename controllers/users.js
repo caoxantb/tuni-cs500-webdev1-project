@@ -19,8 +19,7 @@ const getAllUsers = async (response) => {
  * @param {Object} currentUser (mongoose document object)
  */
 const deleteUser = async (response, userId, currentUser) => {
-  if (userId === currentUser._id)
-    return badRequest(response, "400 Bad Request");
+  if (userId === currentUser.id) return badRequest(response, "400 Bad Request");
   const user = await User.findById(userId).exec();
   if (!user) return notFound(response, "404 Not Found");
   await User.deleteOne({ _id: userId }).exec();
@@ -39,9 +38,9 @@ const updateUser = async (response, userId, currentUser, userData) => {
   if (
     !userData.role ||
     !["customer", "admin"].includes(userData.role) ||
-    userId === currentUser._id
+    userId === currentUser.id
   )
-    return badRequest(response, "400 Bad Request");
+    return badRequest(response, "Updating own data is not allowed");
   await User.findByIdAndUpdate(userId, { role: userData.role }).exec();
   const user = await User.findById(userId).exec();
   return user ? sendJson(response, user) : notFound(response, "404 Not Found");
@@ -68,11 +67,13 @@ const viewUser = async (response, userId, currentUser) => {
 
 const registerUser = async (response, userData) => {
   try {
+    if (userData.password.length < 10)
+      return badRequest(response, "400 Bad Request");
     const newUser = new User({ ...userData, role: "customer" });
     await newUser.save();
     return sendJson(response, newUser, 201);
   } catch (e) {
-    badRequest(response, "400 Bad Request");
+    return badRequest(response, "400 Bad Request");
   }
 };
 
