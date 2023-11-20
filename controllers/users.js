@@ -35,12 +35,11 @@ const deleteUser = async (response, userId, currentUser) => {
  * @param {Object} userData JSON data from request body
  */
 const updateUser = async (response, userId, currentUser, userData) => {
-  if (
-    !userData.role ||
-    !["customer", "admin"].includes(userData.role) ||
-    userId === currentUser.id
-  )
+  if (!userData.role || !["customer", "admin"].includes(userData.role))
+    return badRequest(response, "400 Bad Request");
+  if (userId === currentUser.id) {
     return badRequest(response, "Updating own data is not allowed");
+  }
   await User.findByIdAndUpdate(userId, { role: userData.role }).exec();
   const user = await User.findById(userId).exec();
   return user ? sendJson(response, user) : notFound(response, "404 Not Found");

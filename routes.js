@@ -1,10 +1,9 @@
 const responseUtils = require("./utils/responseUtils");
-const { acceptsJson, isJson, parseBodyJson } = require("./utils/requestUtils");
+const { acceptsJson } = require("./utils/requestUtils");
 const { renderPublic } = require("./utils/render");
 const { getCurrentUser } = require("./auth/auth");
 const { getAllProducts } = require("./controllers/products");
-const User = require("./models/user");
-const { getAllUsers, registerUser, deleteUser, updateUser, viewUser } = require("./controllers/users");
+const userRouter = require("./routers/users");
 
 /**
  * Known API routes and their allowed methods
@@ -15,7 +14,11 @@ const { getAllUsers, registerUser, deleteUser, updateUser, viewUser } = require(
 const allowedMethods = {
   "/api/register": ["POST"],
   "/api/users": ["GET"],
-  "/api/products": ["GET"],
+  "/api/users/:userId": ["GET", "PUT", "DELETE"],
+  "/api/products": ["GET", "POST"],
+  "/api/products/:productId": ["GET", "PUT", "DELETE"],
+  "/api/orders": ["GET", "POST"],
+  "/api/orders/:orderId": ["GET"],
 };
 
 /**
@@ -51,14 +54,10 @@ const matchIdRoute = (url, prefix) => {
   return regex.test(url);
 };
 
-/**
- * Does the URL match /api/users/{id}
- *
- * @param {string} url filePath
- * @returns {boolean}
- */
-const matchUserId = (url) => {
-  return matchIdRoute(url, "users");
+const matchBaseFilePath = (url, prefix) => {
+  return matchIdRoute(url, prefix)
+    ? `/api/${prefix}/:${prefix.slice(0, -1)}Id`
+    : url;
 };
 
 const handleRequest = async (request, response) => {
@@ -72,76 +71,36 @@ const handleRequest = async (request, response) => {
     return renderPublic(fileName, response);
   }
 
-  if (matchUserId(filePath)) {
-    // TODO: 8.6 Implement view, update and delete a single user by ID (GET, PUT, DELETE) --> DONE
-    const currentUser = await getCurrentUser(request);
-    if (!currentUser) return responseUtils.basicAuthChallenge(response);
-    else if (currentUser.role !== "admin")
-      return responseUtils.forbidden(response);
-
-    const filePathArr = filePath.split("/");
-    let user, body;
-
-    if (filePathArr.length === 4) {
-      switch (method.toUpperCase()) {
-        case "OPTIONS":
-          return sendOptions(filePath, response);
-        case "GET":
-          return await viewUser(response, filePathArr[3], currentUser);
-        case "PUT":
-          body = await parseBodyJson(request);
-          return await updateUser(response, filePathArr[3], currentUser, body);
-        case "DELETE":
-          return await deleteUser(response, filePathArr[3], currentUser);
-        default:
-          return responseUtils.methodNotAllowed(response);
-      }
-    }
-    responseUtils.badRequest(response, "400 Bad Request");
-  }
+  const filePathArr = filePath.split("/");
+  if (filePathArr.length < 3) return responseUtils.notFound(response);
+  const filePathBase = matchBaseFilePath(filePath, filePathArr[2]);
 
   // Default to 404 Not Found if unknown url
-  if (!(filePath in allowedMethods)) return responseUtils.notFound(response);
+  if (!(filePathBase in allowedMethods))
+    return responseUtils.notFound(response);
 
   // See: http://restcookbook.com/HTTP%20Methods/options/
   if (method.toUpperCase() === "OPTIONS")
-    return sendOptions(filePath, response);
+    return sendOptions(filePathBase, response);
 
   // Check for allowable methods
-  if (!allowedMethods[filePath].includes(method.toUpperCase())) {
+  if (!allowedMethods[filePathBase].includes(method.toUpperCase())) {
     return responseUtils.methodNotAllowed(response);
   }
 
-  // Require a correct accept header (require 'application/json' or '*/*')
-  if (!acceptsJson(request)) {
-    return responseUtils.contentTypeNotAcceptable(response);
-  }
-
-  // GET all users
-  if (filePath === "/api/users" && method.toUpperCase() === "GET") {
-    // TODO: 8.5 Add authentication (only allowed to users with role "admin") --> DONE
-    const user = await getCurrentUser(request);
-    if (!user) {
-      return responseUtils.basicAuthChallenge(response);
-    } else if (user.role === "customer") {
-      return responseUtils.forbidden(response);
+  if (["users", "register"].includes(filePathArr[2])) {
+    switch (method.toUpperCase()) {
+      case "GET":
+        return await userRouter.get(filePath, request, response);
+      case "POST":
+        return await userRouter.post(filePath, request, response);
+      case "PUT":
+        return await userRouter.put(filePath, request, response);
+      case "DELETE":
+        return await userRouter.remove(filePath, request, response);
+      default:
+        return responseUtils.methodNotAllowed(response);
     }
-    return await getAllUsers(response);
-  }
-
-  // register new user
-  if (filePath === "/api/register" && method.toUpperCase() === "POST") {
-    // Fail if not a JSON request, don't allow non-JSON Content-Type
-    if (!isJson(request)) {
-      return responseUtils.badRequest(
-        response,
-        "Invalid Content-Type. Expected application/json"
-      );
-    }
-    // TODO: 8.4 Implement registration --> DONE
-    // You can use parseBodyJson(request) method from utils/requestUtils.js to parse request body.
-    const user = await parseBodyJson(request);
-    return await registerUser(response, user);
   }
 
   // read all products
@@ -152,7 +111,6 @@ const handleRequest = async (request, response) => {
       return getAllProducts(response);
     }
     return responseUtils.forbidden(response);
-    // return getAllProducts(request, response);
   }
 };
 
