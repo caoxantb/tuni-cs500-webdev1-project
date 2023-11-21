@@ -28,24 +28,6 @@ const get = async (path, request, response) => {
   return badRequest(response, "400 Bad Request");
 };
 
-// const post = async (path, request, response) => {
-//   if (!acceptsJson(request)) {
-//     return contentTypeNotAcceptable(response);
-//   }
-//   if (!isJson(request)) {
-//     return badRequest(
-//       response,
-//       "Invalid Content-Type. Expected application/json"
-//     );
-//   }
-//   const currentUser = await getCurrentUser(request);
-//   if (!currentUser) return basicAuthChallenge(response);
-//   if (currentUser.role !== "admin") return forbidden(response);
-
-//   const product = await parseBodyJson(request);
-//   return await createProduct(response, product);
-// };
-
 const post = async (path, request, response) => {
   if (!acceptsJson(request)) {
     return contentTypeNotAcceptable(response);
