@@ -7,8 +7,12 @@ const {
   deleteUser,
 } = require("../controllers/users");
 const { isJson, parseBodyJson, acceptsJson } = require("../utils/requestUtils");
-const { basicAuthChallenge, forbidden, badRequest, contentTypeNotAcceptable } = require("../utils/responseUtils");
-
+const {
+  basicAuthChallenge,
+  forbidden,
+  badRequest,
+  contentTypeNotAcceptable,
+} = require("../utils/responseUtils");
 
 const get = async (path, request, response) => {
   if (!acceptsJson(request)) {
@@ -24,7 +28,7 @@ const get = async (path, request, response) => {
   } else if (pathArr.length === 3) {
     return await getAllUsers(response);
   }
-  return responseUtils.badRequest(response, "400 Bad Request");
+  return badRequest(response, "400 Bad Request");
 };
 
 const post = async (path, request, response) => {

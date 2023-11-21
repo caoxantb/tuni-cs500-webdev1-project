@@ -1,9 +1,8 @@
 const responseUtils = require("./utils/responseUtils");
-const { acceptsJson } = require("./utils/requestUtils");
 const { renderPublic } = require("./utils/render");
-const { getCurrentUser } = require("./auth/auth");
-const { getAllProducts } = require("./controllers/products");
 const userRouter = require("./routers/users");
+const productRouter = require("./routers/products");
+const orderRouter = require("./routers/orders");
 
 /**
  * Known API routes and their allowed methods
@@ -60,10 +59,7 @@ const matchBaseFilePath = (url, prefix) => {
     : url;
 };
 
-const handleRequest = async (request, response) => {
-  const { url, method, headers } = request;
-  const filePath = new URL(url, `http://${headers.host}`).pathname;
-
+const config = (response, method, filePath) => {
   // serve static files from public/ and return immediately
   if (method.toUpperCase() === "GET" && !filePath.startsWith("/api")) {
     const fileName =
@@ -87,30 +83,34 @@ const handleRequest = async (request, response) => {
   if (!allowedMethods[filePathBase].includes(method.toUpperCase())) {
     return responseUtils.methodNotAllowed(response);
   }
+};
 
-  if (["users", "register"].includes(filePathArr[2])) {
-    switch (method.toUpperCase()) {
-      case "GET":
-        return await userRouter.get(filePath, request, response);
-      case "POST":
-        return await userRouter.post(filePath, request, response);
-      case "PUT":
-        return await userRouter.put(filePath, request, response);
-      case "DELETE":
-        return await userRouter.remove(filePath, request, response);
-      default:
-        return responseUtils.methodNotAllowed(response);
-    }
-  }
+const handleRequest = async (request, response) => {
+  const { url, method, headers } = request;
+  const filePath = new URL(url, `http://${headers.host}`).pathname;
 
-  // read all products
-  if (filePath === "/api/products" && method.toUpperCase() === "GET") {
-    const currentUser = await getCurrentUser(request);
-    if (!currentUser) return responseUtils.basicAuthChallenge(response);
-    if (["customer", "admin"].includes(currentUser.role)) {
-      return getAllProducts(response);
-    }
-    return responseUtils.forbidden(response);
+  config(response, method, filePath);
+
+  const filePathArr = filePath.split("/");
+  const router = ["users", "register"].includes(filePathArr[2])
+    ? userRouter
+    : filePathArr[2] === "products"
+    ? productRouter
+    : filePathArr[2] === "orders"
+    ? orderRouter
+    : undefined;
+
+  switch (method.toUpperCase()) {
+    case "GET":
+      return await router.get(filePath, request, response);
+    case "POST":
+      return await router.post(filePath, request, response);
+    case "PUT":
+      return await router.put(filePath, request, response);
+    case "DELETE":
+      return await router.remove(filePath, request, response);
+    default:
+      return responseUtils.methodNotAllowed(response);
   }
 };
 
