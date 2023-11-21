@@ -1,11 +1,11 @@
 const { getCurrentUser } = require("../auth/auth");
 const {
-  viewUser,
-  getAllUsers,
-  registerUser,
-  updateUser,
-  deleteUser,
-} = require("../controllers/users");
+  getAllProducts,
+  getProductById,
+  createProduct,
+  updateProductById,
+  deleteProduct
+} = require("../controllers/products");
 const { isJson, parseBodyJson, acceptsJson } = require("../utils/requestUtils");
 const {
   basicAuthChallenge,
@@ -20,13 +20,12 @@ const get = async (path, request, response) => {
   }
   const currentUser = await getCurrentUser(request);
   if (!currentUser) return basicAuthChallenge(response);
-  if (currentUser.role !== "admin") return forbidden(response);
 
   const pathArr = path.split("/");
   if (pathArr.length === 4) {
-    return await viewUser(response, pathArr[3], currentUser);
+    return await getProductById(response, pathArr[3]);
   } else if (pathArr.length === 3) {
-    return await getAllUsers(response);
+    return await getAllProducts(response);
   }
   return badRequest(response, "400 Bad Request");
 };
@@ -41,8 +40,12 @@ const post = async (path, request, response) => {
       "Invalid Content-Type. Expected application/json"
     );
   }
-  const user = await parseBodyJson(request);
-  return await registerUser(response, user);
+  const currentUser = await getCurrentUser(request);
+  if (!currentUser) return basicAuthChallenge(response);
+  if (currentUser.role !== "admin") return forbidden(response);
+
+  const product = await parseBodyJson(request);
+  return await createProduct(response, product);
 };
 
 const put = async (path, request, response) => {
@@ -56,7 +59,7 @@ const put = async (path, request, response) => {
   const pathArr = path.split("/");
   if (pathArr.length === 4) {
     const body = await parseBodyJson(request);
-    return await updateUser(response, pathArr[3], currentUser, body);
+    return await updateProductById(response, pathArr[3], currentUser, body);
   }
   return badRequest(response, "400 Bad Request");
 };
@@ -71,11 +74,11 @@ const remove = async (path, request, response) => {
 
   const pathArr = path.split("/");
   if (pathArr.length === 4) {
-    return await deleteUser(response, pathArr[3], currentUser);
+    return await deleteProduct(response, pathArr[3], currentUser);
   }
   return badRequest(response, "400 Bad Request");
 };
 
-const userRouter = { get, post, put, remove };
+const productRouter = { get, post, put, remove };
 
-module.exports = userRouter;
+module.exports = productRouter;
