@@ -2,6 +2,7 @@ const responseUtils = require("./utils/responseUtils");
 const { renderPublic } = require("./utils/render");
 const userRouter = require("./routers/users");
 const productRouter = require("./routers/products");
+const orderRouter = require("./routers/orders");
 
 /**
  * Known API routes and their allowed methods
@@ -95,6 +96,8 @@ const handleRequest = async (request, response) => {
     ? userRouter
     : filePathArr[2] === "products"
     ? productRouter
+    : filePathArr[2] === "orders"
+    ? orderRouter
     : undefined;
 
   switch (method.toUpperCase()) {
