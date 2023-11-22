@@ -1,9 +1,7 @@
 const Order = require("../models/order");
 const { sendJson, badRequest, notFound } = require("../utils/responseUtils");
-const { getCurrentUser } = require("../auth/auth");
 
 const getOrders = async (response, currentUser) => {
-  //const currentUser = await getCurrentUser(request);
   if (currentUser.role === "admin") {
     const orders = await Order.find({}).exec();
     return sendJson(response, orders);
