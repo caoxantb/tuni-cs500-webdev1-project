@@ -83,7 +83,7 @@ const updateProduct = async (response, productID, productData) => {
       return badRequest(response, "400 Bad Request");
     }
     
-    await Product.findByIdAndUpdate(productID, { name, price }).exec();
+    await Product.findByIdAndUpdate(productID, { ...productData }).exec();
     const product = await Product.findById(productID).exec();
     return sendJson(response, product);
   } catch (error) {

@@ -23,11 +23,34 @@ resposible for: TODO, short description of duties
 
 TODO: A table with links to at least 10 of your group's GitLab issues, listed with their associated Mocha tests and test files.
 
-## Security concerns
+## 8.3.5 Security concerns
 
-TODO: list the security threats represented in the course slides.
-Document how your application protects against the threats.
-You are also free to add more security threats + protection here, if you will.
+<b>There are some cyber crime our web can meet:</b>
+* Cross-Site Scripting (XSS) 
+* Session hijacking
+* SQL Injection
+* Directory traversal
+  
+<b>Because our web has a submission block for user login,  our cookies is not well protected & our URL did not encode yet.
+We can prevent those by:</b>
 
+* We strictly validate user input when login
+* We using HTTPS instead of HTTP
+* Urlencode our URL
 
-_Good luck and happy group workin'!_
+## 8.3.7 Finalization
+<b>Learning from project</b>
+* Construction of simple end-to-end applications
+* Basics understanding of browser: HTML, CSS, JS, DOM
+* Basic understanding of HTTP servers
+* Creating Dynamic web applications
+* HTTP sessions
+* Handling of HTTP requests
+* Architecture insights
+* User authentication technologies
+* Dynamic DOM programming from JavaScript
+
+<b>Improving later</b>
+* Using a different authentication method
+* Having a payment page when users place an order in the shopping cart
+* When login in as a customer role, the register page and user page do not show
