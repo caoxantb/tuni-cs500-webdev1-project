@@ -1,7 +1,8 @@
 const { getCurrentUser } = require("../auth/auth");
 const {
   getOrders,
-  viewOrder
+  viewOrder,
+  createOrder
 } = require("../controllers/orders");
 const { isJson, parseBodyJson, acceptsJson } = require("../utils/requestUtils");
 const {
@@ -27,6 +28,24 @@ const get = async (path, request, response) => {
   return badRequest(response, "400 Bad Request");
 };
 
-const orderRouter = { get };
+const post = async (path, request, response) => {
+  if (!acceptsJson(request)) {
+    return contentTypeNotAcceptable(response);
+  }
+  if (!isJson(request)) {
+    return badRequest(
+      response,
+      "Invalid Content-Type. Expected application/json"
+    );
+  }
+  const currentUser = await getCurrentUser(request);
+  if (!currentUser) return basicAuthChallenge(response);
+  if (currentUser.role === "admin") return forbidden(response);
+
+  const order = await parseBodyJson(request);
+  return await createOrder(response, order, currentUser);
+};
+
+const orderRouter = { get, post };
 
 module.exports = orderRouter;
