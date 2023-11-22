@@ -20,8 +20,7 @@ const get = async (path, request, response) => {
     }
     const currentUser = await getCurrentUser(request);
     if (!currentUser) return basicAuthChallenge(response);
-    if (currentUser.role !== "admin") return forbidden(response);
-
+    
     const pathArr = path.split("/");
     if (pathArr.length === 4) {
         return await viewProduct(response, pathArr[3]);
@@ -35,6 +34,8 @@ const post = async (path, request, response) => {
     if (!acceptsJson(request)) {
         return contentTypeNotAcceptable(response);
     }
+    const currentUser = await getCurrentUser(request);
+    if (currentUser.role !== "admin") return forbidden(response);
     if (!isJson(request)) {
         return badRequest(
             response,

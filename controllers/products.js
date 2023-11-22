@@ -21,7 +21,8 @@ const getAllProducts = (response) => {
 const newProduct = async (response, productData) => {
   try {
     const newProduct = new Product({...productData});
-    return responseUtils.sendJson(response, await newProduct.save(), 201);
+    await newProduct.save();
+    return responseUtils.sendJson(response, newProduct, 201);
   } catch (error) {
     return responseUtils.badRequest(response, error);
   }
@@ -36,7 +37,7 @@ const newProduct = async (response, productData) => {
 const deleteProduct = async (response, productID) => {
   const productToDelete = await Product.findOne({ _id : productID }).exec();
   
-  if (productToDelete === null) {
+  if (productToDelete !== productID) {
     return responseUtils.notFound(response);
   }
 
@@ -53,7 +54,7 @@ const deleteProduct = async (response, productID) => {
 const viewProduct = async (response, productID) => {
   const product = await Product.findOne({ _id : productID}).exec();
 
-  if (product === null) return responseUtils.notFound(response);
+  if (product !== productID) return responseUtils.notFound(response);
   
   return responseUtils.sendJson(response, product);
 };
@@ -62,17 +63,17 @@ const updateProduct = async (response, productID, productData) => {
 
   const product = await Product.findOne({ _id : productID}).exec();
 
-  if (product === null) return responseUtils.notFound(response);
+  if (product !== productID) return responseUtils.notFound(response);
 
   try {
-    // if ('name' in productData && (!(productData['name'] instanceof String) || productData['name'].length === 0)) {
-    //   return responseUtils.badRequest(response);
-    // }
-
-    Object.keys(productData).forEach(key => {
-      product[key] = productData[key];
-    });
-    return responseUtils.sendJson(response, await product.save());
+    const { name, price } = productData;
+    if (!name?.length || isNaN(price) || price <= 0) {
+      return badRequest(response, "400 Bad Request");
+    }
+    
+    await Product.findByIdAndUpdate(productID, { name, price }).exec();
+    const product = await Product.findById(productID).exec();
+    return responseUtils.sendJson(response, product);
   } catch (error) {
     return responseUtils.badRequest(response, "Invalid request");
   }
