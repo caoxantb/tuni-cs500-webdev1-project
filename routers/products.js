@@ -1,7 +1,7 @@
 const { getCurrentUser} = require("../auth/auth");
 const {
     getAllProducts,
-    newProduct,
+    createProduct,
     deleteProduct,
     viewProduct,
     updateProduct,
@@ -44,7 +44,7 @@ const post = async (path, request, response) => {
         );
     }
     const product = await parseBodyJson(request);
-    return await newProduct(response, product);
+    return await createProduct(response, product);
 };
 
 const put = async (path, request, response) => {
@@ -69,7 +69,7 @@ const remove = async (path, request, response) => {
     }
     const currentUser = await getCurrentUser(request);
     if (!currentUser) return basicAuthChallenge(response);
-    if (currentUser.role !== "admin") return forbidden(response)    
+    if (currentUser.role !== "admin") return forbidden(response);
 
     const pathArr = path.split("/");
     if (pathArr.length === 4) {

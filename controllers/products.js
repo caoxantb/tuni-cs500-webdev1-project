@@ -4,7 +4,7 @@ const { sendJson, badRequest, notFound } = require("../utils/responseUtils");
 /**
  * Send all products as JSON
  *
- * @param {http.ServerResponse} response
+ * @param {http.ServerResponse} response the http response
  */
 const getAllProducts = async (response) => {
   const products = await Product.find({}).exec();
@@ -18,7 +18,7 @@ const getAllProducts = async (response) => {
  * @param {ServerResponse} response the http response
  * @param {object} productData JSON data from request body
  */
-const newProduct = async (response, productData) => {
+const createProduct = async (response, productData) => {
   try {
     const newProduct = new Product({...productData});
     await newProduct.save();
@@ -60,7 +60,6 @@ const viewProduct = async (response, productID) => {
   const product = await Product.findOne({ _id : productID}).exec();
 
   if (!product) return notFound(response);
-  
   return sendJson(response, product);
 };
 
@@ -72,11 +71,6 @@ const viewProduct = async (response, productID) => {
  * @param {object} productData JSON data from request body
  */
 const updateProduct = async (response, productID, productData) => {
-
-  const product = await Product.findOne({ _id : productID}).exec();
-
-  if (!product) return notFound(response);
-
   try {
     const { name, price } = productData;
     if (!name?.length || isNaN(price) || price <= 0) {
@@ -85,10 +79,11 @@ const updateProduct = async (response, productID, productData) => {
     
     await Product.findByIdAndUpdate(productID, { ...productData }).exec();
     const product = await Product.findById(productID).exec();
+    if (!product) return notFound(response);
     return sendJson(response, product);
   } catch (error) {
     return badRequest(response, "400 Bad Request");
   }
 };
 
-module.exports = { getAllProducts, newProduct, deleteProduct, viewProduct, updateProduct };
+module.exports = { getAllProducts, createProduct, deleteProduct, viewProduct, updateProduct };
