@@ -24,7 +24,8 @@ const allowedMethods = {
  * Send response to client options request.
  *
  * @param {string} filePath pathname of the request URL
- * @param {http.ServerResponse} response
+ * @param {http.ServerResponse} response - The HTTP server response object.
+ * @returns {void} - This function does not return a value explicitly.
  */
 const sendOptions = (filePath, response) => {
   if (filePath in allowedMethods) {
@@ -44,8 +45,8 @@ const sendOptions = (filePath, response) => {
  * Does the url have an ID component as its last part? (e.g. /api/users/dsf7844e)
  *
  * @param {string} url filePath
- * @param {string} prefix
- * @returns {boolean}
+ * @param {string} prefix model path
+ * @returns {boolean} if id is valid for model
  */
 const matchIdRoute = (url, prefix) => {
   const idPattern = "[0-9a-z]{8,24}";
@@ -85,6 +86,15 @@ const config = (response, method, filePath) => {
   }
 };
 
+/**
+ * Handles incoming HTTP requests by routing them to the appropriate handler.
+ *
+ * @param {http.IncomingMessage} request - The incoming HTTP request object.
+ * @param {http.ServerResponse} response - The HTTP server response object.
+ * @returns {Promise<void>} A Promise that resolves when the request handling is complete.
+ *
+ * @throws {Error} Throws an error if the request cannot be handled.
+ */
 const handleRequest = async (request, response) => {
   const { url, method, headers } = request;
   const filePath = new URL(url, `http://${headers.host}`).pathname;

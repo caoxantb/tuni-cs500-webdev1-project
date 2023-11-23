@@ -4,11 +4,11 @@ const fs = require('fs');
 const NOT_FOUND_TEMPLATE = path.resolve(__dirname, '../public/404.html');
 
 /**
- * Render file from ./public directory (calls response.end())
+ * Render a public file based on the provided file path.
  *
- * @param {string} filePath
- * @param {http.ServerResponse} response
- * @returns {void}
+ * @param {string} filePath - The file path to be rendered.
+ * @param {http.ServerResponse} response - The HTTP server response object.
+ * @returns {void} - This function does not return a value explicitly.
  */
 const renderPublic = (filePath, response) => {
   if (!filePath) return renderNotFound(response);
@@ -22,20 +22,20 @@ const renderPublic = (filePath, response) => {
 };
 
 /**
- * Render ../views/404.html (calls response.end())
+ * Render a "Not Found" response using a predefined template.
  *
- * @param {http.ServerResponse} response
- * @returns {void}
+ * @param {http.ServerResponse} response - The HTTP server response object.
+ * @returns {void} - This function does not return a value explicitly.
  */
 const renderNotFound = response => {
   renderFile(NOT_FOUND_TEMPLATE, getContentType('html'), response);
 };
 
 /**
- * Get Content-Type based on file extension
+ * Get the content type based on the provided file extension.
  *
- * @param {string} fileExtension
- * @returns {string} contentType
+ * @param {string} fileExtension - The file extension used to determine the content type.
+ * @returns {string} - The content type corresponding to the file extension.
  */
 const getContentType = fileExtension => {
   let contentType = 'text/html';

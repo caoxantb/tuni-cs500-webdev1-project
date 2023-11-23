@@ -2,10 +2,12 @@ const { getCredentials } = require("../utils/requestUtils");
 const User = require("../models/user");
 
 /**
- * Get current user based on the request headers
+ * Get the current user based on the "Authorization" request header.
  *
- * @param {http.IncomingMessage} request
- * @returns {Object|null} current authenticated user or null if not yet authenticated
+ * @param {http.IncomingMessage} request - The incoming HTTP request object.
+ * @returns {Promise<User|null>} A Promise that resolves to the current user or null if not found.
+ *
+ * @throws {Error} Throws an error if there's an issue with fetching the user or checking the password.
  */
 const getCurrentUser = async (request) => {
   // TODO: 8.5 Implement getting current user based on the "Authorization" request header --> DONE

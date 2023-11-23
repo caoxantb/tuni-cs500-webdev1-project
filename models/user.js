@@ -90,10 +90,10 @@ const userSchema = new Schema({
 });
 
 /**
- * Compare supplied password with user's own (hashed) password
+ * Check if the provided password matches the hashed password of the user.
  *
- * @param {string} password
- * @returns {Promise<boolean>} promise that resolves to the comparison result
+ * @param {string} password - The password to be checked.
+ * @returns {Promise<boolean>} A Promise that resolves to true if the passwords match, otherwise false.
  */
 userSchema.methods.checkPassword = async function(password) {
   // TODO: 9.5 Implement this --> DONE

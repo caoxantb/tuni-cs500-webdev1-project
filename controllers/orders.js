@@ -2,10 +2,13 @@ const Order = require("../models/order");
 const { sendJson, badRequest, notFound } = require("../utils/responseUtils");
 
 /**
- * Send all orders as JSON according to User's role
+ * Get orders based on the user's role.
  *
- * @param {http.ServerResponse} response
- * @param {Object} currentUser (mongoose document object)
+ * @param {http.ServerResponse} response - The HTTP server response object.
+ * @param {User} currentUser - The current user object.
+ * @returns {Promise<void>} A Promise that resolves after sending the JSON response.
+ *
+ * @throws {Error} Throws an error if there's an issue with fetching orders from the database.
  */
 const getOrders = async (response, currentUser) => {
   if (currentUser.role === "admin") {
@@ -18,11 +21,14 @@ const getOrders = async (response, currentUser) => {
 };
 
 /**
- * Send order data as JSON
+ * View order data as JSON.
  *
- * @param {http.ServerResponse} response
- * @param {string} orderId
- * @param {Object} currentUser (mongoose document object)
+ * @param {http.ServerResponse} response - The HTTP server response object.
+ * @param {string} orderId - The ID of the order to view.
+ * @param {User} currentUser - The current user object (mongoose document).
+ * @returns {Promise<void>} A Promise that resolves after sending the JSON response.
+ *
+ * @throws {Error} Throws an error if there's an issue with fetching the order from the database.
  */
 const viewOrder = async (response, orderId, currentUser) => {
   if (currentUser.role === "admin") {
@@ -42,11 +48,14 @@ const viewOrder = async (response, orderId, currentUser) => {
 };
 
 /**
- * Create a new order and send created order back as JSON
+ * Create a new order and send the created order back as JSON.
  *
- * @param {http.ServerResponse} response
- * @param {Object} orderData JSON data from request body
- * @param {Object} currentUser (mongoose document object)
+ * @param {http.ServerResponse} response - The HTTP server response object.
+ * @param {User} orderData - JSON data from the request body representing the new order.
+ * @param {User} currentUser - The current user object (mongoose document).
+ * @returns {Promise<void>} A Promise that resolves after sending the JSON response.
+ *
+ * @throws {Error} Throws an error if there's an issue with creating or saving the order.
  */
 const createOrder = async (response, orderData, currentUser) => {
   try {

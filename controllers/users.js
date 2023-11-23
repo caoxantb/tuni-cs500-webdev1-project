@@ -2,9 +2,12 @@ const User = require("../models/user");
 const { sendJson, badRequest, notFound } = require("../utils/responseUtils");
 
 /**
- * Send all users as JSON
+ * Send all users as JSON.
  *
- * @param {http.ServerResponse} response
+ * @param {http.ServerResponse} response - The HTTP server response object.
+ * @returns {Promise<void>} A Promise that resolves after sending the JSON response.
+ *
+ * @throws {Error} Throws an error if there's an issue with fetching users from the database.
  */
 const getAllUsers = async (response) => {
   const users = await User.find({}).exec();
@@ -12,11 +15,14 @@ const getAllUsers = async (response) => {
 };
 
 /**
- * Delete user and send deleted user as JSON
+ * Delete a user and send the deleted user as JSON.
  *
- * @param {http.ServerResponse} response
- * @param {string} userId
- * @param {Object} currentUser (mongoose document object)
+ * @param {http.ServerResponse} response - The HTTP server response object.
+ * @param {string} userId - The ID of the user to be deleted.
+ * @param {object} currentUser - The current user object (mongoose document).
+ * @returns {Promise<void>} A Promise that resolves after sending the JSON response.
+ *
+ * @throws {Error} Throws an error if there's an issue with fetching, deleting, or sending the user.
  */
 const deleteUser = async (response, userId, currentUser) => {
   if (userId === currentUser.id) return badRequest(response, "400 Bad Request");
@@ -29,10 +35,10 @@ const deleteUser = async (response, userId, currentUser) => {
 /**
  * Update user and send updated user as JSON
  *
- * @param {http.ServerResponse} response
- * @param {string} userId
- * @param {Object} currentUser (mongoose document object)
- * @param {Object} userData JSON data from request body
+ * @param {http.ServerResponse} response - The HTTP server response object.
+ * @param {string} userId - The ID of the user to be updated
+ * @param {object} currentUser (mongoose document object)
+ * @param {object} userData JSON data from request body
  */
 const updateUser = async (response, userId, currentUser, userData) => {
   if (!userData.role || !["customer", "admin"].includes(userData.role))
@@ -46,11 +52,15 @@ const updateUser = async (response, userId, currentUser, userData) => {
 };
 
 /**
- * Send user data as JSON
+ * Update a user's role and send the updated user as JSON.
  *
- * @param {http.ServerResponse} response
- * @param {string} userId
- * @param {Object} currentUser (mongoose document object)
+ * @param {http.ServerResponse} response - The HTTP server response object.
+ * @param {string} userId - The ID of the user to be updated.
+ * @param {object} currentUser - The current user object (mongoose document).
+ * @param {object} userData - The updated user data, including the new role.
+ * @returns {Promise<void>} A Promise that resolves after sending the JSON response.
+ *
+ * @throws {Error} Throws an error if there's an issue with updating, fetching, or sending the user.
  */
 const viewUser = async (response, userId, currentUser) => {
   const user = await User.findById({ _id: userId }).exec();
@@ -58,12 +68,14 @@ const viewUser = async (response, userId, currentUser) => {
 };
 
 /**
- * Register new user and send created user back as JSON
+ * Register a new user and send the created user as JSON.
  *
- * @param {http.ServerResponse} response
- * @param {Object} userData JSON data from request body
+ * @param {http.ServerResponse} response - The HTTP server response object.
+ * @param {object} userData - The user data for registration, including the password.
+ * @returns {Promise<void>} A Promise that resolves after sending the JSON response.
+ *
+ * @throws {Error} Throws an error if there's an issue with validating, creating, or sending the user.
  */
-
 const registerUser = async (response, userData) => {
   try {
     if (userData.password.length < 10)
