@@ -84,6 +84,8 @@ const config = (response, method, filePath) => {
   if (!allowedMethods[filePathBase].includes(method.toUpperCase())) {
     return responseUtils.methodNotAllowed(response);
   }
+
+  return true;
 };
 
 /**
@@ -99,7 +101,8 @@ const handleRequest = async (request, response) => {
   const { url, method, headers } = request;
   const filePath = new URL(url, `http://${headers.host}`).pathname;
 
-  config(response, method, filePath);
+  const res = config(response, method, filePath);
+  if (res !== true) return res;
 
   const filePathArr = filePath.split("/");
   const router = ["users", "register"].includes(filePathArr[2])
