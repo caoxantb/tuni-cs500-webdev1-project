@@ -38,6 +38,8 @@ We can prevent those by:</b>
 * We using HTTPS instead of HTTP
 * Urlencode our URL
 
+## 8.3.6 
+
 ## 8.3.7 Finalization
 <b>Learning from project</b>
 * Construction of simple end-to-end applications
