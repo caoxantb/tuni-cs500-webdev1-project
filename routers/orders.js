@@ -1,9 +1,5 @@
 const { getCurrentUser } = require("../auth/auth");
-const {
-  getOrders,
-  viewOrder,
-  createOrder
-} = require("../controllers/orders");
+const { getOrders, viewOrder, createOrder } = require("../controllers/orders");
 const { isJson, parseBodyJson, acceptsJson } = require("../utils/requestUtils");
 const {
   basicAuthChallenge,
