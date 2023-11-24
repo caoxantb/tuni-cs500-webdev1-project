@@ -38,7 +38,18 @@ We can prevent those by:</b>
 * We using HTTPS instead of HTTP
 * Urlencode our URL
 
-## 8.3.6 
+## 8.3.6 Testing
+
+| id   |      GitLab issues                                                                    |  Responsible Person | 
+|------|:--------------------------------------------------------------------------------------|:----------------|
+|  1   |  [Implement CRUD for products in `./controllers/products.js`](https://course-gitlab.tuni.fi/webdev1-fall-2023-groupwork/webdev1-fall2023-group061/-/issues/13) | Hieu Hoang |
+|  2   |  [Implement CRUD for orders in `./controllers/orders.js`](https://course-gitlab.tuni.fi/webdev1-fall-2023-groupwork/webdev1-fall2023-group061/-/issues/14) | Minh Nguyen |
+|  3   |  [Update frontend to match products and orders API](https://course-gitlab.tuni.fi/webdev1-fall-2023-groupwork/webdev1-fall2023-group061/-/issues/17) | An Cao |
+|  4   |  [Refactor handleRequest() function in `./routes.js`](https://course-gitlab.tuni.fi/webdev1-fall-2023-groupwork/webdev1-fall2023-group061/-/issues/11) | An Cao |
+|  5   |  [Write project plan and description in README (Part 1-2)](https://course-gitlab.tuni.fi/webdev1-fall-2023-groupwork/webdev1-fall2023-group061/-/issues/20) | Minh Nguyen |
+|  6   |  [Write project plan and description in README (Part 3-4)](https://course-gitlab.tuni.fi/webdev1-fall-2023-groupwork/webdev1-fall2023-group061/-/issues/21) | An Cao |
+|  7   |  [Write project plan and description in README (Part 5-7)](https://course-gitlab.tuni.fi/webdev1-fall-2023-groupwork/webdev1-fall2023-group061/-/issues/22) | Hieu Hoang |
+|  8   |  [Implement data models for products and orders](https://course-gitlab.tuni.fi/webdev1-fall-2023-groupwork/webdev1-fall2023-group061/-/issues/12) | An Cao |
 
 ## 8.3.7 Finalization
 <b>Learning from project</b>
