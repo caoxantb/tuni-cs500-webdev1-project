@@ -20,7 +20,10 @@ resposible for: 30% of group works
 
 
 ## Project structure
+<b> Structure <b>
 ![Alt text](structure.png)
+
+<b> Models <b>
 ![Alt text](models.png)
 
 ## Pages and navigation
