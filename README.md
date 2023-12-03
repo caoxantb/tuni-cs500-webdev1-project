@@ -32,6 +32,7 @@ TODO: A table with links to at least 10 of your group's GitLab issues, listed wi
 <b> User <b>
 
 | Field | Type | Description |
+| --- | --- | --- |
 | _id | string | ID of user account |
 | name | string | Name of user |
 | email | string | Email of user account |
@@ -41,6 +42,7 @@ TODO: A table with links to at least 10 of your group's GitLab issues, listed wi
 <b> Product <b>
 
 | Field | Type | Description |
+| --- | --- | --- |
 | _id | string | ID of product |
 | name | string | Name of product |
 | price | float | Price of product |
@@ -50,6 +52,7 @@ TODO: A table with links to at least 10 of your group's GitLab issues, listed wi
 <b> Order <b>
 
 | Field | Type | Description | Relationship |
+| --- | --- | --- | --- |
 | _id | string | ID of product | |
 | customerId | string | ID of customer who placed the order | Reference to <b>Customer<b> model |
 | items | Array< OrderedItem > | List of ordered items | Reference to the <b>Ordered Item<b> model |
@@ -57,6 +60,7 @@ TODO: A table with links to at least 10 of your group's GitLab issues, listed wi
 <b> OrderedItem <b>
 
 | Field | Type | Description | Relationship |
+| --- | --- | --- | --- |
 | _id | string | ID of product | |
 | productId | Product | Ordered product | Reference to <b>Product<b> model |
 | quantity | int | Number of items ordered | |
