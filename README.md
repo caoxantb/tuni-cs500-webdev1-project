@@ -19,15 +19,15 @@ resposible for: 30% of group works
 ......
 
 
-## Tests and documentation
+## Project structure
+![Alt text](structure.png)
+![Alt text](models.png)
 
-TODO: A table with links to at least 10 of your group's GitLab issues, listed with their associated Mocha tests and test files.
-
-## 8.3.3 Pages and navigation
+## Pages and navigation
 
 ![Alt text](pages.png)
 
-## 8.3.4 Data models
+## Data models
 
 <b> User <b>
 
@@ -65,7 +65,7 @@ TODO: A table with links to at least 10 of your group's GitLab issues, listed wi
 | productId | Product | Ordered product | Reference to <b>Product<b> model |
 | quantity | int | Number of items ordered | |
 
-## 8.3.5 Security concerns
+## Security concerns
 
 <b>There are some cyber crime our web can meet:</b>
 * Cross-Site Scripting (XSS) 
@@ -80,7 +80,7 @@ We can prevent those by:</b>
 * We using HTTPS instead of HTTP
 * Urlencode our URL
 
-## 8.3.6 Testing
+## Tests and documentation
 
 | id   |      GitLab issues                                                                    |  Responsible Person | 
 |------|:--------------------------------------------------------------------------------------|:----------------|
@@ -93,7 +93,7 @@ We can prevent those by:</b>
 |  7   |  [Write project plan and description in README (Part 5-7)](https://course-gitlab.tuni.fi/webdev1-fall-2023-groupwork/webdev1-fall2023-group061/-/issues/22) | Hieu Hoang |
 |  8   |  [Implement data models for products and orders](https://course-gitlab.tuni.fi/webdev1-fall-2023-groupwork/webdev1-fall2023-group061/-/issues/12) | An Cao |
 
-## 8.3.7 Finalization
+## Finalization
 <b>Learning from project</b>
 * Construction of simple end-to-end applications
 * Basics understanding of browser: HTML, CSS, JS, DOM
