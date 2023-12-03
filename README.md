@@ -23,6 +23,48 @@ resposible for: TODO, short description of duties
 
 TODO: A table with links to at least 10 of your group's GitLab issues, listed with their associated Mocha tests and test files.
 
+## 8.3.3 Pages and navigation
+
+![Alt text](pages.png)
+
+## 8.3.4 Data models
+
+<b> User <b>
+
+| Field | Type | Description |
+| --- | --- | --- |
+| _id | string | ID of user account |
+| name | string | Name of user |
+| email | string | Email of user account |
+| password | string | Password of user account |
+| role | string | Role of user (customer/admin) |
+
+<b> Product <b>
+
+| Field | Type | Description |
+| --- | --- | --- |
+| _id | string | ID of product |
+| name | string | Name of product |
+| price | float | Price of product |
+| image | string | URL of product image |
+| description | string | Description of product |
+
+<b> Order <b>
+
+| Field | Type | Description | Relationship |
+| --- | --- | --- | --- |
+| _id | string | ID of product | |
+| customerId | string | ID of customer who placed the order | Reference to <b>Customer<b> model |
+| items | Array< OrderedItem > | List of ordered items | Reference to the <b>Ordered Item<b> model |
+
+<b> OrderedItem <b>
+
+| Field | Type | Description | Relationship |
+| --- | --- | --- | --- |
+| _id | string | ID of product | |
+| productId | Product | Ordered product | Reference to <b>Product<b> model |
+| quantity | int | Number of items ordered | |
+
 ## 8.3.5 Security concerns
 
 <b>There are some cyber crime our web can meet:</b>
