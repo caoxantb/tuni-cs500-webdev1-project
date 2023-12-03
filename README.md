@@ -6,15 +6,15 @@ What should be in this document is detailed in the 11th exercise round assignmen
 
 # Group 
 
-Member1:  name, email, student ID, 
-resposible for: TODO, short description of duties 
+Member1:  Cao Xuan An, an.cao@tuni.fi, 151454314, 
+resposible for: 40% of group works
 
-Member2:  name, email, student ID, 
-resposible for: TODO, short description of duties 
+Member2:  Hoang Vu Hieu, hieu.hoang@tuni.fi, 151389997, 
+resposible for: 30% of group works
 
 
-Member2:  name, email, student ID, 
-resposible for: TODO, short description of duties 
+Member3:  Nguyen Quang Minh, minh.q.nguyen@tuni.fi, 151395363, 
+resposible for: 30% of group works
 
 ......
 
